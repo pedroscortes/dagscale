@@ -1,0 +1,27 @@
+\begin{table}[t]
+\centering
+\small\setlength{\tabcolsep}{4pt}
+\caption{Raw-units real data. Projected F1 against the consensus graph (Sachs, 17 edges, $n=853$) and the ground-truth graph (Causal Chambers light tunnel, 39 edges, $n=10{,}000$); a cross marks a non-acyclic output in the sense of \cref{sec:exp-setup}. The conditional-variance floor is the leading-order value of \cref{sec:exp-setup}, computed from the data alone. Values above $0.01$ flag a non-acyclic DAGMA output.}
+\label{tab:realdata}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{Sachs (raw)} & \multicolumn{2}{c}{Causal Chambers (raw)} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Method & F1 & acyclic & F1 & acyclic \\
+\midrule
+DAGMA (least squares) & 0.42 & $\times$ & 0.37 & $\times$ \\
+DAGMA, noise units & 0.59 & \checkmark & 0.57 & \checkmark \\
+CoLiDE-EV & 0.56 & $\times$ & 0.55 & $\times$ \\
+CoLiDE-NV & 0.56 & $\times$ & 0.51 & $\times$ \\
+DAGMA, log-likelihood & 0.42 & $\times$ & 0.35 & $\times$ \\
+Analytic constraint$^{\dagger}$ & 0.42 & $\times$ & 0.42 & $\times$ \\
+NOTEARS & 0.59 & \checkmark & 0.53 & \checkmark \\
+TOPO & 0.67 & \checkmark & 0.42 & \checkmark \\
+GOLEM-EV & 0.27 & \checkmark & 0.08 & \checkmark \\
+GOLEM-NV & 0.38 & \checkmark & 0.04 & \checkmark \\
+\midrule
+Conditional-variance floor & \multicolumn{2}{c}{14.6} & \multicolumn{2}{c}{501} \\
+\bottomrule
+\end{tabular}
+\par\smallskip\footnotesize$^{\dagger}$Our re-implementation of \citet{zhang2025analytic}; the official repository is empty.
+\end{table}

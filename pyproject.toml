@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dagscale"
+version = "1.0.0"
+description = "Code for 'The impact of data scale and barrier schedule on acyclicity in continuous DAG learning'"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Pedro Cortes dos Santos" }, { name = "Renato A. Krohling" }]
+dependencies = [
+    "numpy==2.4.4",
+    "scipy==1.17.1",
+    "jax==0.10.0",
+    "jaxlib==0.10.0",
+    "scikit-learn==1.8.0",
+    "matplotlib==3.10.8",
+    "pandas==3.0.3",
+    "tqdm==4.67.3",
+    "dagma==1.1.1",
+    "torch==2.11.0",
+    "gcastle==1.0.4",
+    "notears @ git+https://github.com/xunzheng/notears.git@eb06eaf08ca90501a8caa4062d62466747ba3cec",
+    "causalchamber==0.2.8",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[tool.hatch.build.targets.wheel]
+packages = ["dagscale"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501", "E731", "E741", "B023", "B905"]

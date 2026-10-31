@@ -1,0 +1,3 @@
+Sachs, Perez, Pe'er, Lauffenburger, Nolan (2005), Science 308(5721):523-529; 11 proteins, raw intensities.
+sachs_cd3cd28_853.csv: the anti-CD3/CD28 observational condition (853 cells); sachs_pooled_7466.csv: all nine conditions pooled.
+Copied from the CMU Tetrad example-causal-datasets distribution.
