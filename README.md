@@ -11,6 +11,15 @@ uv pip install -e .
 
 This installs CPU builds of jax and torch. TOPO and the log-likelihood DAGMA variant (`topo`, `dagma_logll*` in `scripts/methods.py`) need the dagrad package, which is not redistributed here because of its non-commercial licence; install it by hand with `uv pip install --no-deps "dagrad @ git+https://github.com/Duntrain/dagrad.git@4ce4c5a"` (`--no-deps` keeps the pinned notears). GOLEM runs in a subprocess (`scripts/run_golem.py`); set `GOLEM_PYTHON` to an interpreter with gcastle and torch if the current one should not be used.
 
+## Check data before fitting
+
+```python
+from dagscale.check import check, noise_units
+
+print(check(X))          # ok / too small / too large / spread, from the covariance alone
+X_fit = noise_units(X)   # divide by the median conditional standard deviation
+```
+
 ## Reproduce
 
 All commands run from the repository root. Each run script writes to `results/<script name>/`; `WORKERS` (or `--workers`) sets the number of processes.
@@ -47,6 +56,7 @@ python scripts/objective_gap.py
 python scripts/schedule.py
 python scripts/newton_cg.py
 python scripts/selfloop_share.py
+python scripts/intro_example.py
 ```
 
 The files stored gzipped in `results/` (`*.csv.gz`) are the gzipped outputs of the commands above.

@@ -1,5 +1,5 @@
 # ruff: noqa: N806, RUF001
-"""Figures 2 to 4 from the result files, written as PDFs to argv[1] (default figures/)."""
+"""Figures 1 to 4 from the result files, written as PDFs to argv[1] (default figures/)."""
 
 from __future__ import annotations
 
@@ -51,6 +51,45 @@ def rows(*paths):
         with op(p, "rt") as fh:
             out += [r for r in csv.DictReader(fh) if not r.get("error")]
     return out
+
+
+def fig_intro():
+    z = np.load(f"{R}/intro_example/intro_example.npz")
+    A = z["A"].astype(bool)  # A[target, source]
+    d = A.shape[0]
+    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.9))
+    for i, ax in enumerate(axes):
+        W = np.abs(z[f"W{i}"].T) > 0.3
+        loops = np.diag(W).copy()
+        np.fill_diagonal(W, False)
+        marks = [
+            (W & A, C[0], "s", "correct edge"),
+            (W & ~A, C[1], "s", "wrong edge"),
+            (A & ~W, "none", "s", "missed edge"),
+            (np.diag(loops), C[3], "D", "self-loop"),
+        ]
+        for M, col, mk, lab in marks:
+            r, c = np.nonzero(M)
+            ax.scatter(c, r, s=16, marker=mk, c=col, edgecolors=MUTED if col == "none" else col, linewidths=0.6,
+                       label=lab)
+        ax.set_xlim(-0.8, d - 0.2)
+        ax.set_ylim(d - 0.2, -0.8)
+        ax.set_aspect("equal")
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.grid(False)
+        for sp in ax.spines.values():
+            sp.set_visible(True)
+        h = float(z[f"h{i}"])
+        n_ok, n_true = int((W & A).sum()), int(A.sum())
+        ax.set_title(f"data ×{z['c'][i]:g}: {n_ok} of {n_true} edges", pad=4)
+        ax.set_xlabel(f"barrier value {h:.2g}\ncheck: {z[f'status{i}']}", color=INK)
+    axes[0].set_ylabel("target", color=INK)
+    h, lab = axes[2].get_legend_handles_labels()
+    fig.legend(h, lab, loc="lower center", ncol=4, frameon=False, bbox_to_anchor=(0.5, -0.02))
+    fig.tight_layout(rect=(0, 0.08, 1, 1))
+    fig.savefig(f"{OUT}/fig_intro.pdf")
+    plt.close(fig)
 
 
 def fig_window():
@@ -180,6 +219,7 @@ def fig_breadth():
 
 
 if __name__ == "__main__":
+    fig_intro()
     fig_window()
     fig_leaklaw()
     fig_breadth()
