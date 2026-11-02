@@ -30,7 +30,7 @@ class ScaleCheck:
 
 def conditional_variances(X) -> np.ndarray:
     """Var(X_j | X_-j) = 1 / Theta_jj from the sample precision matrix."""
-    return 1.0 / np.diag(np.linalg.inv(np.cov(X, rowvar=False)))
+    return 1.0 / np.diag(np.linalg.inv(np.cov(X, rowvar=False, bias=True)))
 
 
 def noise_units(X) -> np.ndarray:
@@ -41,9 +41,9 @@ def noise_units(X) -> np.ndarray:
 def check(X, lambda1=0.02, mu=1e-4, s=0.6, h_tol=0.01, max_spread=8.0) -> ScaleCheck:
     """Covariance-only check before fitting: is X below, inside or above the scale window?"""
     X = np.asarray(X, dtype=float)
-    S = np.cov(X, rowvar=False)
+    S = np.cov(X, rowvar=False, bias=True)
     cv = conditional_variances(X)
-    floor = mu**2 * s**2 / 4 * float(np.sum(cv**2))
+    floor = mu**2 * s**2 / 4 * float(np.sum(np.maximum(cv - lambda1, 0.0) ** 2))  # diagonal penalised by lambda1
     off = np.abs(S - np.diag(np.diag(S)))
     empty = [int(j) for j in np.flatnonzero(off.max(axis=0) <= lambda1)]
     var = np.diag(S)
@@ -59,7 +59,7 @@ def check(X, lambda1=0.02, mu=1e-4, s=0.6, h_tol=0.01, max_spread=8.0) -> ScaleC
     return ScaleCheck(
         status=status,
         floor=floor,
-        floor_headroom=(h_tol / floor) ** 0.25,
+        floor_headroom=(h_tol / floor) ** 0.25 if floor > 0 else float("inf"),
         empty_columns=empty,
         spread=spread,
         factor=float(1.0 / np.sqrt(np.median(cv))),
