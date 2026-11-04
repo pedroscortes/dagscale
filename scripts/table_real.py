@@ -11,6 +11,8 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from dagscale.check import check
 from sachs import COND1, load
 
 
@@ -45,15 +47,14 @@ def acyclic(r):
     return h not in ("nan", "") and float(h) <= 0.01
 
 
-def floor_leading(X, mu=1e-4, s=0.6):
-    """Leading-order conditional-variance floor mu^2 s^2 / 4 sum_j Var(X_j | X_-j)^2."""
-    cv = 1.0 / np.diag(np.linalg.inv(np.cov(X, rowvar=False)))
-    return mu**2 * s**2 / 4 * float(np.sum(cv**2))
+def floor_leading(X, lambda1=0.02, mu=1e-4, s=0.6):
+    """Conditional-variance floor of dagscale.check: mu^2 s^2 / 4 sum_j (Var(X_j | X_-j) - lambda1)_+^2."""
+    return check(X, lambda1=lambda1, mu=mu, s=s).floor
 
 
 X = load(COND1)
 fl_s = floor_leading(X)
-fl_c = next(float(r["floor_leading"]) for r in CF if r["variant"] == "raw")  # same formula, light tunnel
+fl_c = next(float(r["floor_leading"]) for r in CF if r["variant"] == "raw")  # light tunnel, from the rerun CSV (1/(n-1) covariance, no lambda1; differs from check() by under 0.02%)
 order = [
     ("dagma", "DAGMA (least squares)"),
     ("dagma_nnorm", "DAGMA, noise units"),
